@@ -1,31 +1,61 @@
-<script>
-// Fungsi ini akan menerima data JSON dari model Gemma
-async function executeSkill(data) {
-    // ⚠️ GANTI DENGAN URL WEBHOOK APPS SCRIPT ANDA
-    const scriptUrl = "https://script.google.com/macros/s/AKfycby8fBfnJkwusldxLWVUTLB3GXazkYvxIBnWrGtHDIy3VQ6yYTJvJ_6FWqddgTOxSAKx/exec"; 
-    // ⚠️ GANTI DENGAN CHAT ID TELEGRAM ANDA
-    const chatId = "CHAT_ID_TELEGRAM_ANDA"; 
-    
-    // Membentuk teks sesuai format baku yang sudah kita setting di Apps Script:
-    // [Deskripsi] [Nominal] [Kategori] via [Subcategory] [Priority]
-    const textMessage = `${data.merchant} ${data.amount} ${data.category} via EdgeAI ${data.priority}`;
-    
-    // Membuat payload yang "menyamar" sebagai pesan dari Telegram
-    const payload = {
-        message: {
-            chat: { id: chatId },
-            text: textMessage
-        }
-    };
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CashFlow EdgeAI Webhook</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; padding: 20px; text-align: center; background-color: #fafafa; }
+        .container { background-color: #ffffff; border-radius: 12px; padding: 30px 20px; margin-top: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { color: #2c3e50; margin-bottom: 10px; }
+        p { color: #7f8c8d; line-height: 1.5; font-size: 14px; }
+        .code-snippet { background-color: #ecf0f1; padding: 10px; border-radius: 6px; font-family: monospace; font-size: 12px; margin-top: 20px; color: #e74c3c; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>⚙️ CashFlow EdgeAI Script</h2>
+        <p>Aplikasi siap mengekstrak struk. (Target Chat ID: -1003786171776)</p>
+        <div class="code-snippet">
+            Status: Menunggu eksekusi...
+        </div>
+    </div>
 
-    try {
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        return "Sukses! Data telah masuk ke Google Sheets dan Telegram.";
-    } catch (e) {
-        return "Gagal mengirim data: " + e.message;
+    <script>
+    // Fungsi ini akan menerima data JSON dari model Gemma di Edge Gallery
+    async function executeSkill(data) {
+        // URL Webhook Apps Script Anda
+        const scriptUrl = "https://script.google.com/macros/s/AKfycby8fBfnJkwusldxLWVUTLB3GXazkYvxIBnWrGtHDIy3VQ6yYTJvJ_6FWqddgTOxSAKx/exec"; 
+        
+        // Chat ID Telegram Anda
+        const chatId = "-1003786171776"; 
+        
+        // Membentuk teks sesuai format baku:
+        // [Deskripsi] [Nominal] [Kategori] via [Subcategory] [Priority]
+        const textMessage = `${data.merchant} ${data.amount} ${data.category} via EdgeAI ${data.priority}`;
+        
+        // Membuat payload yang "menyamar" sebagai pesan dari Telegram
+        const payload = {
+            message: {
+                chat: { id: chatId },
+                text: textMessage
+            }
+        };
+
+        try {
+            await fetch(scriptUrl, {
+                method: 'POST',
+                mode: 'no-cors', // Penting untuk melewati blokir keamanan
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8' 
+                },
+                body: JSON.stringify(payload)
+            });
+            return "Sukses! Data telah masuk ke Google Sheets dan Telegram.";
+        } catch (e) {
+            return "Gagal mengirim data: " + e.message;
+        }
     }
-}
-</script>
+    </script>
+</body>
+</html>
