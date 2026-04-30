@@ -1,0 +1,31 @@
+<script>
+// Fungsi ini akan menerima data JSON dari model Gemma
+async function executeSkill(data) {
+    // ⚠️ GANTI DENGAN URL WEBHOOK APPS SCRIPT ANDA
+    const scriptUrl = "https://script.google.com/macros/s/AKfycby8fBfnJkwusldxLWVUTLB3GXazkYvxIBnWrGtHDIy3VQ6yYTJvJ_6FWqddgTOxSAKx/exec"; 
+    // ⚠️ GANTI DENGAN CHAT ID TELEGRAM ANDA
+    const chatId = "CHAT_ID_TELEGRAM_ANDA"; 
+    
+    // Membentuk teks sesuai format baku yang sudah kita setting di Apps Script:
+    // [Deskripsi] [Nominal] [Kategori] via [Subcategory] [Priority]
+    const textMessage = `${data.merchant} ${data.amount} ${data.category} via EdgeAI ${data.priority}`;
+    
+    // Membuat payload yang "menyamar" sebagai pesan dari Telegram
+    const payload = {
+        message: {
+            chat: { id: chatId },
+            text: textMessage
+        }
+    };
+
+    try {
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        return "Sukses! Data telah masuk ke Google Sheets dan Telegram.";
+    } catch (e) {
+        return "Gagal mengirim data: " + e.message;
+    }
+}
+</script>
