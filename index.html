@@ -30,28 +30,19 @@
         // Chat ID Telegram Anda
         const chatId = "-1003786171776"; 
         
-        // Membentuk teks sesuai format baku:
-        // [Deskripsi] [Nominal] [Kategori] via [Subcategory] [Priority]
-        const textMessage = `${data.merchant} ${data.amount} ${data.category} via EdgeAI ${data.priority}`;
+        // Subcategory default untuk menandai asal input di Google Sheets
+        const subcategory = "EdgeAI"; 
         
-        // Membuat payload yang "menyamar" sebagai pesan dari Telegram
-        const payload = {
-            message: {
-                chat: { id: chatId },
-                text: textMessage
-            }
-        };
+        // Membentuk teks persis seperti format manual Anda di Telegram:
+        // Contoh output: "MINISO 323425 Household Supplies via EdgeAI needs"
+        const textMessage = `${data.merchant} ${data.amount} ${data.category} via ${subcategory} ${data.priority}`;
+        
+        // Menggunakan metode GET untuk menghindari blokir CORS
+        const finalUrl = `${scriptUrl}?chatId=${chatId}&text=${encodeURIComponent(textMessage)}`;
 
         try {
-            await fetch(scriptUrl, {
-                method: 'POST',
-                mode: 'no-cors', // Penting untuk melewati blokir keamanan
-                headers: {
-                    'Content-Type': 'text/plain;charset=utf-8' 
-                },
-                body: JSON.stringify(payload)
-            });
-            return "Sukses! Data telah masuk ke Google Sheets dan Telegram.";
+            await fetch(finalUrl, { method: 'GET', mode: 'no-cors' });
+            return "Berhasil dikirim ke Dashboard Keuangan!";
         } catch (e) {
             return "Gagal mengirim data: " + e.message;
         }
